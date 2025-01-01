@@ -1,0 +1,6 @@
+bin/
+tmp/
+Session.vim
+makefile
+.env
+CONTAINER_ID
