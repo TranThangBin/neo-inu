@@ -10,18 +10,12 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var (
-	token   *string
-	rmcmd   *bool
-	guildId *string
-)
-
 func main() {
 	godotenv.Load()
 
-	token = flag.String("token", os.Getenv("TOKEN"), "Your discord bot token look for TOKEN variable if not provide")
-	rmcmd = flag.Bool("rmcmd", true, "Remove all command after shutdown default: true")
-	guildId = flag.String("guild", "", "Test guild ID default: \"\" (mean global)")
+	token := flag.String("token", os.Getenv("TOKEN"), "Your discord bot token look for TOKEN variable if not provide")
+	rmcmd := flag.Bool("rmcmd", true, "Remove all command after shutdown default: true")
+	guildId := flag.String("guild", "", "Test guild ID default: \"\" (mean global)")
 
 	flag.Parse()
 
