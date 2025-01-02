@@ -3,10 +3,10 @@ package main
 import (
 	"flag"
 	"log"
+	"neo-inu/internal"
 	"os"
 	"os/signal"
 
-	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
 )
 
@@ -25,24 +25,27 @@ func main() {
 
 	flag.Parse()
 
-	s, err := discordgo.New("Bot " + *token)
-	if err != nil {
+	neoinu := internal.NewNeoInu(*token, *rmcmd, *guildId)
+
+	if err := neoinu.Init(); err != nil {
 		log.Fatalln("Invalid bot token " + *token + ": " + err.Error())
 	}
 
-	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
-		log.Printf("Neo inu ready: %v#%v\n", s.State.User.Username, s.State.User.Discriminator)
-	})
-
-	if err = s.Open(); err != nil {
+	if err := neoinu.Open(); err != nil {
 		log.Fatalln("Something went wrong when starting the bot: ", err.Error())
 	}
 
-	defer s.Close()
+	if err := neoinu.AddSlashCommand(internal.NewPingCommand()); err != nil {
+		log.Println("Something went wrong when adding ping command")
+	}
+
+	defer neoinu.Close()
 
 	stop := make(chan os.Signal, 1)
+
 	signal.Notify(stop, os.Interrupt, os.Kill)
 	log.Println("Press Ctrl+C to exit")
+
 	<-stop
 
 	log.Println("Neo inu... Peace out!")

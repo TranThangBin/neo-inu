@@ -14,6 +14,9 @@ run:
 stop:
 	$(SCRIPT) stop
 
+restart:
+	$(SCRIPT) restart
+
 clean_container:
 	$(SCRIPT) clean_container
 
