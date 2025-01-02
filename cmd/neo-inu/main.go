@@ -6,6 +6,7 @@ import (
 	"neo-inu/internal"
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/joho/godotenv"
 )
@@ -37,7 +38,7 @@ func main() {
 
 	stop := make(chan os.Signal, 1)
 
-	signal.Notify(stop, os.Interrupt, os.Kill)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM)
 	log.Println("Press Ctrl+C to exit")
 
 	<-stop
