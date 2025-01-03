@@ -42,7 +42,7 @@ clean_container() {
 }
 
 clean_image() {
-	docker image rm ${IMAGE_NAME}:${IMAGE_VERSION}
+	docker image rm ${IMAGE_NAME}:${IMAGE_VERSION} && docker image prune -f
 	return 0
 }
 
