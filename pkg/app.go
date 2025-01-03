@@ -1,7 +1,7 @@
 package pkg
 
 type App interface {
-	Init() error
+	Init()
 	Open() error
 	Close() error
 }

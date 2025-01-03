@@ -5,17 +5,20 @@ SCRIPT := ./script/main.sh
 build_bin:
 	go build -o ./bin/neo-inu ./cmd/neo-inu/main.go
 
+make clean_bin:
+	rm -rf ./bin ./tmp
+
 build:
 	$(SCRIPT) build
 
 run:
 	$(SCRIPT) run
 
-stop:
-	$(SCRIPT) stop
-
 restart:
 	$(SCRIPT) restart
+
+stop:
+	$(SCRIPT) stop
 
 clean_container:
 	$(SCRIPT) clean_container

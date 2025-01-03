@@ -4,7 +4,7 @@ import "github.com/bwmarrin/discordgo"
 
 type PingCommand struct{}
 
-func (p *PingCommand) ApplicationCommand() *discordgo.ApplicationCommand {
+func (p *PingCommand) NewApplicationCommand() *discordgo.ApplicationCommand {
 	return &discordgo.ApplicationCommand{
 		Name:        "ping",
 		Description: "Say pong",

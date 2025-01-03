@@ -27,13 +27,13 @@ run() {
 	fi
 }
 
+restart() {
+	docker restart ${CONTAINER_ID}
+}
+
 stop() {
 	docker stop ${CONTAINER_ID}
 	return 0
-}
-
-restart() {
-	docker restart ${CONTAINER_ID}
 }
 
 clean_container() {
