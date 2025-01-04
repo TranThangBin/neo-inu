@@ -16,7 +16,7 @@ build() {
 }
 
 attach() {
-	docker container --attach ${CONTAINER_ID}
+	docker container attach ${CONTAINER_ID}
 }
 
 run() {
@@ -56,7 +56,7 @@ clean() {
 }
 
 case $1 in
-build | run | stop | restart | tag | clean_container | clean_image | clean)
+build | attach | run | stop | restart | tag | clean_container | clean_image | clean)
 	$1
 	;;
 "")

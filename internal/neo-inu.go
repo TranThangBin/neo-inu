@@ -13,7 +13,7 @@ type NeoInu struct {
 	guildId            string
 	session            *discordgo.Session
 	commands           []pkg.Command
-	commandHandlers    map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate)
+	commandHandlers    map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) error
 	registeredCommands []*discordgo.ApplicationCommand
 }
 
@@ -26,7 +26,7 @@ func (n *NeoInu) Init() {
 	}
 
 	n.registeredCommands = make([]*discordgo.ApplicationCommand, 0, 20)
-	n.commandHandlers = make(map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate))
+	n.commandHandlers = make(map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) error)
 
 }
 
@@ -57,7 +57,7 @@ func (n *NeoInu) onReady(s *discordgo.Session, _ *discordgo.Ready) {
 	for _, cmd := range n.commands {
 		c, err := n.addSlashCommand(s, cmd)
 		if err != nil {
-			log.Printf("Cannot add command %s because of {%v}\n", c.Name, err)
+			log.Printf("Cannot add command %s because of {%v}\n", cmd.NewApplicationCommand().Name, err)
 		} else {
 			log.Println("Successfully added command: ", c.Name)
 		}
@@ -67,7 +67,11 @@ func (n *NeoInu) onReady(s *discordgo.Session, _ *discordgo.Ready) {
 
 func (n *NeoInu) onCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if h, ok := n.commandHandlers[i.ApplicationCommandData().Name]; ok {
-		h(s, i)
+		err := h(s, i)
+		if err != nil {
+			log.Printf("An error happened when executing command %s: {%v}",
+				i.ApplicationCommandData().Name, err)
+		}
 	}
 }
 
@@ -75,12 +79,14 @@ func (n *NeoInu) addSlashCommand(s *discordgo.Session, cmd pkg.Command) (
 	*discordgo.ApplicationCommand, error,
 ) {
 	c, err := s.ApplicationCommandCreate(n.session.State.User.ID, n.guildId, cmd.NewApplicationCommand())
+
 	if err != nil {
 		return nil, err
 	}
 	if n.rmcmd {
 		n.registeredCommands = append(n.registeredCommands, c)
 	}
+
 	n.commandHandlers[c.Name] = cmd.Execute
 	return c, nil
 }

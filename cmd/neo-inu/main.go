@@ -30,7 +30,8 @@ func main() {
 	}
 
 	var neoinu pkg.App = internal.NewNeoInu(*token, *rmcmd, *guildId,
-		internal.NewPingCommand())
+		internal.NewPingCommand(),
+		internal.NewYgoCommand())
 	neoinu.Init()
 	if err := neoinu.Open(); err != nil {
 		log.Fatalln("Something went wrong when starting the bot: ", err.Error())
