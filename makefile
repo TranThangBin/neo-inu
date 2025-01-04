@@ -8,6 +8,9 @@ build_bin:
 make clean_bin:
 	rm -rf ./bin ./tmp
 
+tag:
+	$(SCRIPT) tag
+
 build:
 	$(SCRIPT) build
 

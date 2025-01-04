@@ -31,6 +31,10 @@ restart() {
 	docker restart ${CONTAINER_ID}
 }
 
+tag() {
+	git tag ${IMAGE_VERSION}
+}
+
 stop() {
 	docker stop ${CONTAINER_ID}
 	return 0
@@ -47,7 +51,7 @@ clean_image() {
 }
 
 case $1 in
-build | run | stop | restart | clean_container | clean_image)
+build | run | stop | restart | tag | clean_container | clean_image)
 	$1
 	;;
 "")
