@@ -12,7 +12,11 @@ if [[ -f ${CONTAINER_ID_FILE} ]]; then
 fi
 
 build() {
-	docker build -t ${IMAGE_NAME}:${IMAGE_VERSION} . && docker image prune -f
+	docker build -t ${IMAGE_NAME}:${IMAGE_VERSION} .
+}
+
+attach() {
+	docker container --attach ${CONTAINER_ID}
 }
 
 run() {
@@ -37,21 +41,22 @@ tag() {
 
 stop() {
 	docker stop ${CONTAINER_ID}
-	return 0
 }
 
 clean_container() {
 	docker container rm ${CONTAINER_ID} && rm ${CONTAINER_ID_FILE}
-	return 0
 }
 
 clean_image() {
-	docker image rm ${IMAGE_NAME}:${IMAGE_VERSION} && docker image prune -f
-	return 0
+	docker image rm ${IMAGE_NAME}:${IMAGE_VERSION}
+}
+
+clean() {
+	stop || clean_container || clean_image && docker image prune -f
 }
 
 case $1 in
-build | run | stop | restart | tag | clean_container | clean_image)
+build | run | stop | restart | tag | clean_container | clean_image | clean)
 	$1
 	;;
 "")
