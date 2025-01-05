@@ -8,8 +8,9 @@ type Command interface {
 	NewResponse(params interface{}) *discordgo.InteractionResponse
 }
 
-var PublicCommandOption = &discordgo.ApplicationCommandOption{
-	Type:        discordgo.ApplicationCommandOptionBoolean,
-	Name:        "public",
-	Description: "If you want to make this response public on the guild",
-}
+// Need a solution on defer command follow up flag
+// var PublicCommandOption = &discordgo.ApplicationCommandOption{
+// 	Type:        discordgo.ApplicationCommandOptionBoolean,
+// 	Name:        "public",
+// 	Description: "If you want to make this response public on the guild",
+// }

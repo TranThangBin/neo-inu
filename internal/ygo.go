@@ -9,8 +9,14 @@ import (
 
 type YgoCommand struct{}
 
-type ygoCommandParams struct {
-	Random bool
+type YgoCommandOptionType int
+
+const (
+	YgoCommandOptionTypeRandom YgoCommandOptionType = iota
+)
+
+type YgoCommandParams struct {
+	Option YgoCommandOptionType
 }
 
 func (yg *YgoCommand) NewApplicationCommand() *discordgo.ApplicationCommand {
@@ -21,6 +27,7 @@ func (yg *YgoCommand) NewApplicationCommand() *discordgo.ApplicationCommand {
 			{
 				Type:        discordgo.ApplicationCommandOptionSubCommand,
 				Name:        "random",
+				Required:    false,
 				Description: "Give you a random Yu-gi-oh card",
 			},
 		},
@@ -28,57 +35,55 @@ func (yg *YgoCommand) NewApplicationCommand() *discordgo.ApplicationCommand {
 }
 
 func (yg *YgoCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCreate) error {
-	params := ygoCommandParams{
-		Random: false,
+	params := YgoCommandParams{}
+
+	if i.ApplicationCommandData().Options[0].Name == "random" {
+		params.Option = YgoCommandOptionTypeRandom
 	}
-	for _, opt := range i.ApplicationCommandData().Options {
-		switch opt.Name {
-		case "random":
-			params.Random = true
-		}
-	}
+
 	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Flags: discordgo.MessageFlagsEphemeral,
+		},
 	})
 	if err != nil {
 		return err
 	}
+
 	resp := yg.NewResponse(params)
 	_, err = s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
 		Embeds:  resp.Data.Embeds,
-		Flags:   resp.Data.Flags,
 		Content: resp.Data.Content,
 	})
+
 	return err
 }
 
 func (yg *YgoCommand) NewResponse(params interface{}) *discordgo.InteractionResponse {
-	cmdParams := params.(ygoCommandParams)
+	cmdParams := params.(YgoCommandParams)
 
-	if cmdParams.Random {
-		resp, err := ygo.RandomCard()
-		if err != nil {
-			log.Printf("An error happened when getting random ygo card: {%v}", err)
-			return &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "Something went wrong when retriving ygo card",
-					Flags:   discordgo.MessageFlagsEphemeral,
-				},
-			}
-		}
+	if cmdParams.Option == YgoCommandOptionTypeRandom {
+		return yg.NewRandomCardResponse()
+	}
+
+	return &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: "Something went wrong when fetching from ygoprodeck api",
+		},
+	}
+}
+
+func (yg YgoCommand) NewRandomCardResponse() *discordgo.InteractionResponse {
+	resp, err := ygo.RandomCard()
+
+	if err != nil {
+		log.Printf("An error happened when getting random ygo card: {%v}", err)
 		return &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Flags: discordgo.MessageFlagsEphemeral,
-				Embeds: []*discordgo.MessageEmbed{
-					{
-						Type: discordgo.EmbedTypeImage,
-						Image: &discordgo.MessageEmbedImage{
-							URL: resp.Data[0].CardImages[0].ImageUrlSmall,
-						},
-					},
-				},
+				Content: "Something went wrong when retriving ygo card",
 			},
 		}
 	}
@@ -86,8 +91,14 @@ func (yg *YgoCommand) NewResponse(params interface{}) *discordgo.InteractionResp
 	return &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "Why are we here",
-			Flags:   discordgo.MessageFlagsEphemeral,
+			Embeds: []*discordgo.MessageEmbed{
+				{
+					Type: discordgo.EmbedTypeImage,
+					Image: &discordgo.MessageEmbedImage{
+						URL: resp.Data[0].CardImages[0].ImageUrl,
+					},
+				},
+			},
 		},
 	}
 }

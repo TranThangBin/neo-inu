@@ -1,7 +1,8 @@
-package pkg
+package internal
 
 import (
 	"log"
+	"neo-inu/pkg"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -11,7 +12,7 @@ type NeoInu struct {
 	rmcmd              bool
 	guildId            string
 	session            *discordgo.Session
-	commands           []Command
+	commands           []pkg.Command
 	commandHandlers    map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) error
 	registeredCommands []*discordgo.ApplicationCommand
 }
@@ -74,7 +75,7 @@ func (n *NeoInu) onCommand(s *discordgo.Session, i *discordgo.InteractionCreate)
 	}
 }
 
-func (n *NeoInu) addSlashCommand(s *discordgo.Session, cmd Command) (
+func (n *NeoInu) addSlashCommand(s *discordgo.Session, cmd pkg.Command) (
 	*discordgo.ApplicationCommand, error,
 ) {
 	c, err := s.ApplicationCommandCreate(n.session.State.User.ID, n.guildId, cmd.NewApplicationCommand())
@@ -90,7 +91,7 @@ func (n *NeoInu) addSlashCommand(s *discordgo.Session, cmd Command) (
 	return c, nil
 }
 
-func NewNeoInu(token string, rmcmd bool, guildId string, commands ...Command) *NeoInu {
+func NewNeoInu(token string, rmcmd bool, guildId string, commands ...pkg.Command) *NeoInu {
 	return &NeoInu{
 		token:    token,
 		rmcmd:    rmcmd,
