@@ -1,0 +1,12 @@
+name: neo-inu
+
+services:
+  app:
+    container_name: neo-inu
+    image: neo-inu:0.3.0
+    build: .
+    volumes:
+      - ./cmd:/go/src/neo-inu/cmd
+      - ./pkg:/go/src/neo-inu/pkg
+      - ./internal:/go/src/neo-inu/internal
+    env_file: .env
