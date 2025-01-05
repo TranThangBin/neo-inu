@@ -2,4 +2,3 @@ bin/
 tmp/
 Session.vim
 .env
-CONTAINER_ID
