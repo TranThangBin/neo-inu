@@ -14,37 +14,39 @@ git clone https://github.com/TranThangBin/neo-inu.git
 <p>Build the binary if you need nothing else</p>
 
 ```bash
-make build_bin
+go build ./cmd/neo-inu/main.go
 ```
 
 ## Usage
 
 ```
-Usage of ./bin/neo-inu:
+Usage of ./neo-inu
   -guild string
-        Test guild ID default: "" (mean global)
+        Test guild ID. $GUILD is prioritized
   -rmcmd
-        Remove all command after shutdown default: true (default true)
+        Remove all command after shutdown. $RMCMD is prioritized (default true)
   -token string
-        Your discord bot token look for TOKEN variable if not provide (default $TOKEN)
+        Your discord bot token. $TOKEN is prioritized.
 ```
 
 ## Development
 
-1. Give main.sh execute permission
+### Start the container
+
+<p>Remember to create your .env file</p>
 
 ```bash
-chmod +x ./script/main.sh
+touch .env
 ```
-
-2. Build the container
 
 ```bash
-make
+TOKEN="<CHECK -token ON USAGE>"
+RMCMD="<CHECK -rmcmd ON USAGE>"
+GUILD="<CHECK -guild ON USAGE>"
 ```
-
-3. Run the container
 
 ```bash
-make run
+docker compose up -d
 ```
+
+<p>Modify files in ./cmd/ ./pkg/ ./internal/ and the app will live reload</p>
