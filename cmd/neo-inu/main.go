@@ -29,7 +29,7 @@ func main() {
 		*guildId = os.Getenv("GUILD")
 	}
 
-	var neoinu pkg.App = internal.NewNeoInu(*token, *rmcmd, *guildId,
+	var neoinu pkg.App = pkg.NewNeoInu(*token, *rmcmd, *guildId,
 		internal.NewPingCommand(),
 		internal.NewYgoCommand())
 	neoinu.Init()
