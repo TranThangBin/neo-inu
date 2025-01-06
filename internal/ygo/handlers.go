@@ -34,6 +34,20 @@ func (r *RequestQueryBuilder) SetCacheBust(cacheBust string) *RequestQueryBuilde
 	return r
 }
 
+func (r *RequestQueryBuilder) SetFName(fname string) *RequestQueryBuilder {
+	r.queries["fname"] = fname
+	return r
+}
+
+func (r *RequestQueryBuilder) PushQueries(queries map[string]string) *RequestQueryBuilder {
+	for k, v := range queries {
+		if _, exists := r.queries[k]; !exists {
+			r.queries[k] = v
+		}
+	}
+	return r
+}
+
 func (r *RequestQueryBuilder) BuildUrlString() (string, error) {
 	_url, err := url.Parse(apiUrl)
 	if err != nil {
@@ -53,12 +67,36 @@ func NewRequestQueryBuilder() *RequestQueryBuilder {
 	}
 }
 
-func RandomCard() (*Response, error) {
+func SearchRandomCard() (*Response, error) {
 	urlStr, err := NewRequestQueryBuilder().
 		SetNum(1).
 		SetOffset(0).
 		SetSort("random").
 		SetCacheBust("").
+		BuildUrlString()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := http.Get(urlStr)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	ygoResponse := &Response{}
+	err = json.Unmarshal(data, ygoResponse)
+	if err != nil {
+		return nil, err
+	}
+	return ygoResponse, err
+}
+
+func SearchCard(queries map[string]string) (*Response, error) {
+	urlStr, err := NewRequestQueryBuilder().
+		PushQueries(queries).
 		BuildUrlString()
 	if err != nil {
 		return nil, err

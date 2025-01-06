@@ -3,7 +3,7 @@ name: neo-inu
 services:
   app:
     container_name: neo-inu
-    image: neo-inu:0.3.1
+    image: neo-inu:0.4.0
     build: .
     volumes:
       - ./cmd:/go/src/neo-inu/cmd
