@@ -50,3 +50,8 @@ docker compose up -d
 ```
 
 <p>Modify files in ./cmd/ ./pkg/ ./internal/ and the app will live reload</p>
+
+## TODO
+
+- More details Yu-gi-oh card response
+- Play music
