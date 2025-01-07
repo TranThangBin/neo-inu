@@ -8,4 +8,4 @@ RUN go mod download && go mod verify
 COPY . .
 RUN go install github.com/air-verse/air@latest
 
-CMD $(go env GOPATH)/bin/air
+CMD [ "sh", "start.sh" ]
