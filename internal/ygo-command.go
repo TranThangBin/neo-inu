@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"io"
 	"log"
 	"neo-inu/internal/ygo"
 	"os"
@@ -207,7 +208,7 @@ func (yg *YgoCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCrea
 	})
 
 	for _, file := range resp.Data.Files {
-		if f, ok := file.Reader.(*os.File); ok {
+		if f, ok := file.Reader.(io.Closer); ok {
 			f.Close()
 		}
 	}
