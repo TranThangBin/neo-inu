@@ -8,7 +8,8 @@ import (
 	"strconv"
 )
 
-const apiUrl = "https://db.ygoprodeck.com/api/v7/cardinfo.php"
+const cardQueryUrl = "https://db.ygoprodeck.com/api/v7/cardinfo.php"
+const randomCardUrl = "https://db.ygoprodeck.com/api/v7/randomcard.php."
 
 type RequestQueryBuilder struct {
 	queries map[string]string
@@ -49,7 +50,7 @@ func (r *RequestQueryBuilder) PushQueries(queries map[string]string) *RequestQue
 }
 
 func (r *RequestQueryBuilder) BuildUrlString() (string, error) {
-	_url, err := url.Parse(apiUrl)
+	_url, err := url.Parse(cardQueryUrl)
 	if err != nil {
 		return "", err
 	}
@@ -68,16 +69,7 @@ func NewRequestQueryBuilder() *RequestQueryBuilder {
 }
 
 func SearchRandomCard() (*Response, error) {
-	urlStr, err := NewRequestQueryBuilder().
-		SetNum(1).
-		SetOffset(0).
-		SetSort("random").
-		SetCacheBust("").
-		BuildUrlString()
-	if err != nil {
-		return nil, err
-	}
-	resp, err := http.Get(urlStr)
+	resp, err := http.Get(randomCardUrl)
 	if err != nil {
 		return nil, err
 	}

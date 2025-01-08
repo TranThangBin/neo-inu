@@ -91,7 +91,7 @@ func (n *NeoInu) addSlashCommand(s *discordgo.Session, cmd pkg.Command) (
 	return c, nil
 }
 
-func NewNeoInu(token string, rmcmd bool, guildId string, commands ...pkg.Command) *NeoInu {
+func NewNeoInu(token string, rmcmd bool, guildId string, commands []pkg.Command) *NeoInu {
 	return &NeoInu{
 		token:    token,
 		rmcmd:    rmcmd,
