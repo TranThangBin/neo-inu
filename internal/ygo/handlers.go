@@ -19,7 +19,7 @@ func SearchRandomCard() (*Response, error) {
 	}
 	defer resp.Body.Close()
 	ygoResponse := &Response{}
-	err = json.NewDecoder(resp.Body).Decode(&ygoResponse)
+	err = json.NewDecoder(resp.Body).Decode(ygoResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func SearchCard(queries map[string]string) (*Response, error) {
 	}
 	defer resp.Body.Close()
 	ygoResponse := &Response{}
-	err = json.NewDecoder(resp.Body).Decode(&ygoResponse)
+	err = json.NewDecoder(resp.Body).Decode(ygoResponse)
 	if err != nil {
 		return nil, err
 	}
