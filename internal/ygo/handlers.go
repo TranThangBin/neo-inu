@@ -2,7 +2,6 @@ package ygo
 
 import (
 	"encoding/json"
-	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -19,12 +18,8 @@ func SearchRandomCard() (*Response, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
 	ygoResponse := &Response{}
-	err = json.Unmarshal(data, ygoResponse)
+	err = json.NewDecoder(resp.Body).Decode(&ygoResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -46,12 +41,8 @@ func SearchCard(queries map[string]string) (*Response, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
 	ygoResponse := &Response{}
-	err = json.Unmarshal(data, ygoResponse)
+	err = json.NewDecoder(resp.Body).Decode(&ygoResponse)
 	if err != nil {
 		return nil, err
 	}
