@@ -201,17 +201,19 @@ func (yg *YgoCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCrea
 	}
 
 	resp := yg.NewResponse(yg.GetParams(i.ApplicationCommandData()))
+	defer func() {
+		for _, file := range resp.Data.Files {
+			if f, ok := file.Reader.(io.Closer); ok {
+				f.Close()
+			}
+		}
+	}()
+
 	_, err = s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
 		Embeds:  resp.Data.Embeds,
 		Content: resp.Data.Content,
 		Files:   resp.Data.Files,
 	})
-
-	for _, file := range resp.Data.Files {
-		if f, ok := file.Reader.(io.Closer); ok {
-			f.Close()
-		}
-	}
 
 	return err
 }
