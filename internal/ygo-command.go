@@ -17,6 +17,7 @@ type YgoCommandOptionType int
 const (
 	YgoCommandOptionTypeRandom YgoCommandOptionType = iota
 	YgoCommandOptionTypeSearch
+	YgoCommandOptionTypeBanlist
 )
 
 type YgoCommandParams struct {
