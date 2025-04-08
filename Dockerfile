@@ -1,4 +1,4 @@
-FROM golang:1.23.4-alpine3.20
+FROM golang:1.24.1-alpine3.21
 
 WORKDIR /go/src/neo-inu
 
@@ -8,4 +8,4 @@ RUN go mod download && go mod verify
 COPY . .
 RUN go install github.com/air-verse/air@latest
 
-CMD [ "sh", "start.sh" ]
+CMD [ "go", "tool", "air" ]

@@ -9,7 +9,10 @@ services:
       - ./cmd:/go/src/neo-inu/cmd
       - ./pkg:/go/src/neo-inu/pkg
       - ./internal:/go/src/neo-inu/internal
-    env_file: .env
+    environment:
+      TOKEN: ${TOKEN}
+      GUILD: ${GUILD}
+      RMCMD: ${RMCMD}
 
   prod:
     container_name: neo-inu-prod
@@ -17,4 +20,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile.prod
-    env_file: .env
+    environment:
+      TOKEN: ${TOKEN}
+      GUILD: ${GUILD}
+      RMCMD: ${RMCMD}

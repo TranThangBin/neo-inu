@@ -8,17 +8,14 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	token := flag.String("token", "", "Your discord bot token. $TOKEN is prioritized.")
-	rmcmd := flag.Bool("rmcmd", true, "Remove all command after shutdown. $RMCMD is prioritized")
-	guildId := flag.String("guild", "", "Test guild ID. $GUILD is prioritized")
+	token := flag.String("token", "", "your discord bot token. $TOKEN is prioritized.")
+	rmcmd := flag.Bool("rmcmd", true, "remove all command after shutdown. $RMCMD is prioritized")
+	guildId := flag.String("guild", "", "test guild ID. $GUILD is prioritized")
 	flag.Parse()
 
-	godotenv.Load()
 	if os.Getenv("TOKEN") != "" {
 		*token = os.Getenv("TOKEN")
 	}
@@ -29,12 +26,18 @@ func main() {
 		*guildId = os.Getenv("GUILD")
 	}
 
-	var neoinu pkg.App = internal.NewNeoInu(*token, *rmcmd, *guildId, commandList)
-	neoinu.Init()
+	var neoinu pkg.App = internal.NewNeoInu(*token, *rmcmd, *guildId, []pkg.Command{
+		internal.NewPingCommand(),
+		internal.NewYgoCommand(),
+	})
 	if err := neoinu.Open(); err != nil {
-		log.Fatalln("Something went wrong when starting the bot: ", err.Error())
+		log.Fatalln(err, "something went wrong when opening connection")
 	}
-	defer neoinu.Close()
+	defer func() {
+		if err := neoinu.Close(); err != nil {
+			log.Println(err, "something went wrong when closing connection")
+		}
+	}()
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM)
