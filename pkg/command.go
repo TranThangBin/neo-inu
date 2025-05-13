@@ -5,5 +5,4 @@ import "github.com/bwmarrin/discordgo"
 type Command interface {
 	NewApplicationCommand() *discordgo.ApplicationCommand
 	Execute(s *discordgo.Session, i *discordgo.InteractionCreate) error
-	NewResponse(params any) *discordgo.InteractionResponse
 }

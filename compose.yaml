@@ -11,8 +11,8 @@ services:
       - ./internal:/go/src/neo-inu/internal
     environment:
       TOKEN: ${TOKEN}
-      GUILD: ${GUILD}
-      RMCMD: ${RMCMD}
+      RMCMD: true
+      GUILD: ${GUID}
 
   prod:
     container_name: neo-inu-prod
@@ -22,5 +22,5 @@ services:
       dockerfile: ./Dockerfile.prod
     environment:
       TOKEN: ${TOKEN}
-      GUILD: ${GUILD}
-      RMCMD: ${RMCMD}
+      RMCMD: true
+      GUILD: ${GUID}

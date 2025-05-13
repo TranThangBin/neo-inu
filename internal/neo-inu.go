@@ -25,13 +25,12 @@ func (n *NeoInu) Open() error {
 func (n *NeoInu) Close() error {
 	if n.rmcmd {
 		for _, cmd := range n.registeredCommands {
-			if err := n.session.ApplicationCommandDelete(
-				n.session.State.User.ID, n.guildId, cmd.ID,
-			); err != nil {
+			err := n.session.ApplicationCommandDelete(n.session.State.User.ID, n.guildId, cmd.ID)
+			if err != nil {
 				log.Printf("cannot delete command %s because of {%v}\n", cmd.Name, err)
-			} else {
-				log.Println("successfully deleted command: ", cmd.Name)
+				continue
 			}
+			log.Println("successfully deleted command: ", cmd.Name)
 		}
 	}
 	return n.session.Close()
@@ -40,14 +39,19 @@ func (n *NeoInu) Close() error {
 func (n *NeoInu) onReady(s *discordgo.Session, _ *discordgo.Ready) {
 	log.Printf("Neo inu ready: %v#%v\n", s.State.User.Username, s.State.User.Discriminator)
 	log.Println("Initializing commands...")
-	for _, cmd := range n.commands {
-		c, err := n.addSlashCommand(s, cmd)
+
+	for i, cmd := range n.commands {
+		_cmd := cmd.NewApplicationCommand()
+		c, err := s.ApplicationCommandCreate(n.session.State.User.ID, n.guildId, _cmd)
 		if err != nil {
-			log.Printf("cannot add command %s because of {%v}\n", cmd.NewApplicationCommand().Name, err)
-		} else {
-			log.Println("successfully added command: ", c.Name)
+			log.Printf("cannot add command %s because of {%v}\n", _cmd.Name, err)
+			continue
 		}
+		log.Println("successfully added command: ", c.Name)
+		n.registeredCommands[i] = c
+		n.commandHandlers[c.Name] = cmd.Execute
 	}
+
 	log.Println("finish initializing command!")
 }
 
@@ -55,44 +59,46 @@ func (n *NeoInu) onCommand(s *discordgo.Session, i *discordgo.InteractionCreate)
 	if h, ok := n.commandHandlers[i.ApplicationCommandData().Name]; ok {
 		err := h(s, i)
 		if err != nil {
-			log.Printf("an error happened when executing command %s: {%v}",
-				i.ApplicationCommandData().Name, err)
+			log.Println(
+				err, "an error happened when executing command",
+				i.ApplicationCommandData().Name,
+			)
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Embeds: []*discordgo.MessageEmbed{
+						{
+							Title:       "Error",
+							Description: "Something went wrong when handling the command",
+							Color:       16711680,
+						},
+					},
+				},
+			})
 		}
 	}
 }
 
-func (n *NeoInu) addSlashCommand(s *discordgo.Session, cmd pkg.Command) (
-	*discordgo.ApplicationCommand, error,
-) {
-	c, err := s.ApplicationCommandCreate(n.session.State.User.ID, n.guildId, cmd.NewApplicationCommand())
+func NewNeoInu(token string, rmcmd bool, guildId string) *NeoInu {
+	bot := &NeoInu{}
 
-	if err != nil {
-		return nil, err
-	}
-	if n.rmcmd {
-		n.registeredCommands = append(n.registeredCommands, c)
-	}
-
-	n.commandHandlers[c.Name] = cmd.Execute
-	return c, nil
-}
-
-func NewNeoInu(token string, rmcmd bool, guildId string, commands []pkg.Command) *NeoInu {
 	session, err := discordgo.New("Bot " + token)
 
 	if err != nil {
 		log.Fatalln(err, "something went wrong when initializing Neo Inu")
 	}
 
-	registeredCommands := make([]*discordgo.ApplicationCommand, 0, 20)
-	commandHandlers := make(map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) error)
+	bot.session = session
+	bot.rmcmd = rmcmd
+	bot.guildId = guildId
 
-	return &NeoInu{
-		session:            session,
-		rmcmd:              rmcmd,
-		guildId:            guildId,
-		commands:           commands,
-		registeredCommands: registeredCommands,
-		commandHandlers:    commandHandlers,
+	bot.commands = []pkg.Command{
+		NewPingCommand(),
+		NewYgoCommand(),
+		NewJoinVoiceCommand(),
 	}
+	bot.registeredCommands = make([]*discordgo.ApplicationCommand, len(bot.commands))
+	bot.commandHandlers = make(map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) error, len(bot.commands))
+
+	return bot
 }

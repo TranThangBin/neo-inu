@@ -15,7 +15,7 @@ func (p *PingCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCrea
 	return s.InteractionRespond(i.Interaction, p.NewResponse(nil))
 }
 
-func (p *PingCommand) NewResponse(interface{}) *discordgo.InteractionResponse {
+func (p *PingCommand) NewResponse(any) *discordgo.InteractionResponse {
 	return &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{

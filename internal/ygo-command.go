@@ -5,6 +5,7 @@ import (
 	"log"
 	"neo-inu/internal/ygo"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/bwmarrin/discordgo"
@@ -21,8 +22,9 @@ const (
 )
 
 type YgoCommandParams struct {
-	Option       YgoCommandOptionType
-	SearchOption map[string]string
+	Option        YgoCommandOptionType
+	SearchOption  map[string]string
+	BanlistOption string
 }
 
 func (yg *YgoCommand) NewApplicationCommand() *discordgo.ApplicationCommand {
@@ -34,6 +36,11 @@ func (yg *YgoCommand) NewApplicationCommand() *discordgo.ApplicationCommand {
 				Type:        discordgo.ApplicationCommandOptionSubCommand,
 				Name:        "random",
 				Description: "Give you a random Yu-gi-oh card",
+			},
+			{
+				Type:        discordgo.ApplicationCommandOptionSubCommand,
+				Name:        "banlist",
+				Description: "Get the latest banlist of set format",
 			},
 			{
 				Type:        discordgo.ApplicationCommandOptionSubCommand,
@@ -201,7 +208,8 @@ func (yg *YgoCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCrea
 		return err
 	}
 
-	resp := yg.NewResponse(yg.GetParams(i.ApplicationCommandData()))
+	params := yg.InputParams(i.ApplicationCommandData())
+	resp := yg.NewResponse(params)
 	defer func() {
 		for _, file := range resp.Data.Files {
 			if f, ok := file.Reader.(io.Closer); ok {
@@ -219,9 +227,11 @@ func (yg *YgoCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCrea
 	return err
 }
 
-func (yg *YgoCommand) NewResponse(params interface{}) *discordgo.InteractionResponse {
-	cmdParams := params.(YgoCommandParams)
+func (yg *YgoCommand) NewResponse(params any) *discordgo.InteractionResponse {
+	return yg.ygoCommandResponse(params.(YgoCommandParams))
+}
 
+func (yg *YgoCommand) ygoCommandResponse(cmdParams YgoCommandParams) *discordgo.InteractionResponse {
 	switch cmdParams.Option {
 	case YgoCommandOptionTypeRandom:
 		return yg.NewRandomCardResponse()
@@ -238,7 +248,11 @@ func (yg *YgoCommand) NewResponse(params interface{}) *discordgo.InteractionResp
 	}
 }
 
-func (yg *YgoCommand) GetParams(data discordgo.ApplicationCommandInteractionData) YgoCommandParams {
+func (yg *YgoCommand) InputParams(data discordgo.ApplicationCommandInteractionData) any {
+	return yg.ygoCommandParams(data)
+}
+
+func (yg *YgoCommand) ygoCommandParams(data discordgo.ApplicationCommandInteractionData) YgoCommandParams {
 	params := YgoCommandParams{}
 	subCmd := data.Options[0]
 	switch subCmd.Name {
@@ -304,7 +318,7 @@ func (yg *YgoCommand) NewSearchCardResponse(opt map[string]string) *discordgo.In
 	}
 
 	if len(resp.Data) < 1 {
-		file, err := os.Open("assets/notfound.jpg")
+		file, err := os.Open(filepath.Join("assets", "notfound.jpg"))
 		if err != nil {
 			log.Printf("Something went wrong when opening the notfound image")
 			return nil
