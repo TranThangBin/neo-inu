@@ -1,4 +1,4 @@
-package pkg
+package src
 
 type App interface {
 	Open() error

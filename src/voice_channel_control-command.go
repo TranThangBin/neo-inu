@@ -1,4 +1,4 @@
-package internal
+package src
 
 import "github.com/bwmarrin/discordgo"
 

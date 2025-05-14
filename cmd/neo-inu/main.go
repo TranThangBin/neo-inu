@@ -2,32 +2,34 @@ package main
 
 import (
 	"log"
-	"neo-inu/internal"
-	"neo-inu/pkg"
+	"neo-inu/src"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
 func main() {
-	var neoinu pkg.App = internal.NewNeoInu(
+	logger := log.New(os.Stdout, "", log.LstdFlags)
+
+	var neoinu src.App = src.NewNeoInu(
 		os.Getenv("TOKEN"),
 		os.Getenv("RMCMD") != "false",
 		os.Getenv("GUILD"),
+		logger,
 	)
 	if err := neoinu.Open(); err != nil {
-		log.Fatalln(err, "something went wrong when opening connection")
+		logger.Fatalln(err, "something went wrong when opening connection")
 	}
 	defer func() {
 		if err := neoinu.Close(); err != nil {
-			log.Fatalln(err, "something went wrong when closing connection")
+			logger.Fatalln(err, "something went wrong when closing connection")
 		}
 	}()
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM)
-	log.Println("Press Ctrl+C to exit")
+	logger.Println("Press Ctrl+C to exit")
 	<-stop
 
-	log.Println("Neo inu... Peace out!")
+	logger.Println("Neo inu... Peace out!")
 }

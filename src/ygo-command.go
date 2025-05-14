@@ -1,9 +1,9 @@
-package internal
+package src
 
 import (
 	"io"
 	"log"
-	"neo-inu/internal/ygo"
+	"neo-inu/src/ygo"
 	"os"
 	"path/filepath"
 	"strconv"

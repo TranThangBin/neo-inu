@@ -7,8 +7,7 @@ services:
     build: .
     volumes:
       - ./cmd:/go/src/neo-inu/cmd
-      - ./pkg:/go/src/neo-inu/pkg
-      - ./internal:/go/src/neo-inu/internal
+      - ./src:/go/src/neo-inu/src
     environment:
       TOKEN: ${TOKEN}
       RMCMD: true
