@@ -1,11 +1,11 @@
 package ygo
 
-type Response struct {
-	Data []*YgoCard     `json:"data"`
-	Meta map[string]any `json:"meta"`
+type YgoproDeckResponse struct {
+	Data []*YgoprodeckData `json:"data"`
+	Meta map[string]any    `json:"meta"`
 }
 
-type YgoCard struct {
+type YgoprodeckData struct {
 	CardImages []*YgoCardImage `json:"card_images"`
 }
 

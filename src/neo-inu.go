@@ -89,7 +89,7 @@ func NewNeoInu(token string, rmcmd bool, guildId string, logger *log.Logger) *Ne
 	session, err := discordgo.New("Bot " + token)
 
 	if err != nil {
-		log.Fatalln(err, "something went wrong when initializing Neo Inu")
+		logger.Fatalln(err, "something went wrong when initializing Neo Inu")
 	}
 
 	bot.session = session
@@ -99,7 +99,7 @@ func NewNeoInu(token string, rmcmd bool, guildId string, logger *log.Logger) *Ne
 	bot.commands = []Command{
 		NewPingCommand(),
 		NewYgoCommand(),
-		NewJoinVoiceCommand(),
+		NewVCCCommand(),
 	}
 	bot.registeredCommands = make([]*discordgo.ApplicationCommand, len(bot.commands))
 	bot.commandHandlers = make(map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) error, len(bot.commands))

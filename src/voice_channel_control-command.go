@@ -75,6 +75,6 @@ func (vc *VCCCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCrea
 	return nil
 }
 
-func NewJoinVoiceCommand() *VCCCommand {
+func NewVCCCommand() *VCCCommand {
 	return &VCCCommand{}
 }

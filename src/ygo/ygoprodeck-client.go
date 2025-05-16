@@ -2,7 +2,6 @@ package ygo
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/url"
 )
@@ -12,36 +11,32 @@ const (
 	randomCardUrlStr = "https://db.ygoprodeck.com/api/v7/randomcard.php."
 )
 
-func SearchRandomCard() (*Response, error) {
-	resp, err := http.Get(randomCardUrlStr)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	ygoResponse := &Response{}
-	err = json.NewDecoder(resp.Body).Decode(ygoResponse)
-	if err != nil {
-		return nil, err
-	}
-	return ygoResponse, err
+type ygoprodeckClient struct{}
+
+func (yg *ygoprodeckClient) SearchRandomCard() (*YgoproDeckResponse, error) {
+	return yg.get(randomCardUrlStr)
 }
 
-func SearchCard(queries map[string]string) (*Response, error) {
+func (yg *ygoprodeckClient) SearchCard(queries map[string]string) (*YgoproDeckResponse, error) {
 	cardQueryUrl, err := url.Parse(cardInfoUrlStr)
 	if err != nil {
-		log.Printf("Card query url is malformed. {%v}\n", err)
+		return nil, err
 	}
 	query := cardQueryUrl.Query()
 	for k, v := range queries {
 		query.Add(k, v)
 	}
 	cardQueryUrl.RawQuery = query.Encode()
-	resp, err := http.Get(cardQueryUrl.String())
+	return yg.get(cardQueryUrl.String())
+}
+
+func (yg *ygoprodeckClient) get(url string) (*YgoproDeckResponse, error) {
+	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	ygoResponse := &Response{}
+	ygoResponse := &YgoproDeckResponse{}
 	err = json.NewDecoder(resp.Body).Decode(ygoResponse)
 	if err != nil {
 		return nil, err

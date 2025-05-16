@@ -12,17 +12,13 @@ func (p *PingCommand) NewApplicationCommand() *discordgo.ApplicationCommand {
 }
 
 func (p *PingCommand) Execute(s *discordgo.Session, i *discordgo.InteractionCreate) error {
-	return s.InteractionRespond(i.Interaction, p.NewResponse(nil))
-}
-
-func (p *PingCommand) NewResponse(any) *discordgo.InteractionResponse {
-	return &discordgo.InteractionResponse{
+	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content: "pong",
 			Flags:   discordgo.MessageFlagsEphemeral,
 		},
-	}
+	})
 }
 
 func NewPingCommand() *PingCommand {
